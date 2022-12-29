@@ -2,7 +2,6 @@ from spike import PrimeHub, LightMatrix, Button, StatusLight, ForceSensor, Motio
 from spike.control import wait_for_seconds, wait_until, Timer
 from math import *
 
-
 hub = PrimeHub()
 timer = Timer()
 
@@ -30,10 +29,14 @@ def changeRGBtoHSV(rgb):
 
     # Hの値を計算
     if maxRGB == minRGB : hue = 0
-    elif maxRGB == rgb0_255[0] : hue = 60 * ((rgb0_255[1]-rgb0_255[2])/diff)
-    elif maxRGB == rgb0_255[1] : hue = 60 * ((rgb0_255[2]-rgb0_255[0])/diff) + 120
-    elif maxRGB == rgb0_255[2] : hue = 60 * ((rgb0_255[0]-rgb0_255[1])/diff) + 240
-    if hue < 0 : hue += 360
+    elif maxRGB == rgb0_255[0]:
+        hue = 60 * ((rgb0_255[1] - rgb0_255[2]) / diff)
+    elif maxRGB == rgb0_255[1]:
+        hue = 60 * ((rgb0_255[2] - rgb0_255[0]) / diff) + 120
+    elif maxRGB == rgb0_255[2]:
+        hue = 60 * ((rgb0_255[0] - rgb0_255[1]) / diff) + 240
+    if hue < 0:
+        hue += 360
 
     # Sの値を計算
     if maxRGB != 0:
@@ -51,17 +54,20 @@ while timer.now() < 10:
         rgb_left = colorLeft.get_rgb_intensity()
         hsv_left = changeRGBtoHSV(rgb_left)
         if 150 < hsv_left[0] < 180 and hsv_left[1] > 20 and hsv_left[2] > 10:
-            print('Left sensor is on green')
+            print('Left sensor is over green')
+            break
         rgb_right = colorRight.get_rgb_intensity()
         hsv_right = changeRGBtoHSV(rgb_right)
         if 150 < hsv_right[0] < 180 and hsv_right[1] > 20 and hsv_right[2] > 10:
-            print('Right sensor is on green')
+            print('Right sensor is over green')
+            break
         error = (rgb_left[1] - rgb_right[1]) / 4.7
     except:
         print('cannot get RGB')
     u = Kp * error + Ki * (error + last_error) + Kd * (error - last_error)
     tank.start_tank(int(basic_speed + u),int(basic_speed - u))
     count += 1
+    wait_for_seconds(0.01)
 
 tank.stop()
-print(count)
+print(10/count*1000)
