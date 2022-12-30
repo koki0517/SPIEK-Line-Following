@@ -7,7 +7,12 @@ timer = Timer()
 
 colorLeft = ColorSensor('B')
 colorRight = ColorSensor('D')
+
 tank = MotorPair('A','C')
+tank.set_stop_action('hold')
+
+motorLeft = Motor('A')
+motorRight = Motor('C')
 
 Kp = 0.8
 Ki = 0.08
@@ -47,18 +52,56 @@ def changeRGBtoHSV(rgb):
 
     return hue,saturation,value
 
+def green_intersection(direction):
+    tank.stop()
+    if direftion == "l":
+        deg_start = motorLeft.get_degrees_counted()
+        isRightGreen = False
+        while abs(motorLeft.get_degrees_counted()) <= abs(deg_start) + 50:
+            tank.start_tank(30,30)
+            if isGreen('r'):
+                isRightGreen = True
+        tank.stop()
+        if isRightGreen:
+            u_turn()
+        else:
+            print('turn left')
+    else:
+        deg_start = motorRight.get_degrees_counted()
+        isLeftGreen = False
+        while abs(motorRight.get_degrees_counted()) <= abs(deg_start) + 50:
+            tank.start_tank(30,30)
+            if isGreen('l'):
+                isLeftGreen = True
+        tank.stop()
+        if isLeftGreen:
+            u_turn()
+        else:
+            print('turn right')
+
+def u_turn():
+    print('U-turn')
+
+def isGreen(direction):
+    if direction == 'l':
+        hsv_left = changeRGBtoHSV(colorLeft.get_rgb_intensity())
+        return (150 < hsv_left[0] < 180 and hsv_left[1] > 20 and hsv_left[2] > 10)
+    else:
+        hsv_right = changeRGBtoHSV(colorRight.get_rgb_intensity())
+        return (150 < hsv_right[0] < 180 and hsv_right[1] > 20 and hsv_right[2] > 10)
+
 while timer.now() < 10:
     try:
         rgb_left = colorLeft.get_rgb_intensity()
         hsv_left = changeRGBtoHSV(rgb_left)
         if 150 < hsv_left[0] < 180 and hsv_left[1] > 20 and hsv_left[2] > 10:
             print('Left sensor is over green')
-            break
+            green_intersection('l')
         rgb_right = colorRight.get_rgb_intensity()
         hsv_right = changeRGBtoHSV(rgb_right)
         if 150 < hsv_right[0] < 180 and hsv_right[1] > 20 and hsv_right[2] > 10:
             print('Right sensor is over green')
-            break
+            green_intersection('r')
         error = (rgb_left[1] - rgb_right[1]) / 4.7
     except:
         print('cannot get RGB')
