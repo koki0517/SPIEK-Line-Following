@@ -1,5 +1,9 @@
 # SPIEK-Following-Line
-これはSPIKE PrimeのMicroPythonで動くよ。Pybricksでは使えんで。  
+ロボカップジュニアのレスキューライン向けのコード  
+これはSPIKE Primeのバージョン2代のMicroPython([SPIKE Legacy](https://spikelegacy.legoeducation.com/))で動くよ  
+SPIKE3以降は知らん(2022/12/31時点でMicroPython機能がリリースすらされてない)  
+Pybricksでは使えんで  
+
 ## LineTrace.py
 これをパクればSPIEKPrimeでのライントレースと緑マーカーの判定(Uターンを含む)ができてしまうよ!!  
 係数は自分で調整しろ  
