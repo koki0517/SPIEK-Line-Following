@@ -57,7 +57,7 @@ def green_intersection(direction):
     if direftion == "l":
         deg_start = motorLeft.get_degrees_counted()
         isRightGreen = False
-        while abs(motorLeft.get_degrees_counted()) <= abs(deg_start) + 50:
+        while abs(motorLeft.get_degrees_counted() - deg_start) <= 50:
             tank.start_tank(30,30)
             if isGreen('r'):
                 isRightGreen = True
@@ -69,7 +69,7 @@ def green_intersection(direction):
     else:
         deg_start = motorRight.get_degrees_counted()
         isLeftGreen = False
-        while abs(motorRight.get_degrees_counted()) <= abs(deg_start) + 50:
+        while abs(motorRight.get_degrees_counted() - deg_start) <= 50:
             tank.start_tank(30,30)
             if isGreen('l'):
                 isLeftGreen = True
