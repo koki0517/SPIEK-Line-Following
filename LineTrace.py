@@ -21,9 +21,6 @@ last_error = 0
 error = 0
 basic_speed = 30
 
-count = 0
-timer.reset()
-
 def changeRGBtoHSV(rgb):
     rgb0_255 = rgb[0] * 255 / 1024, rgb[1] * 255 / 1024, rgb[2] * 255 / 1024
     maxRGB, minRGB = max(rgb0_255), min(rgb0_255)
@@ -54,7 +51,7 @@ def changeRGBtoHSV(rgb):
 
 def green_intersection(direction):
     tank.stop()
-    if direftion == "l":
+    if direction == "l":
         deg_start = motorLeft.get_degrees_counted()
         isRightGreen = False
         while abs(motorLeft.get_degrees_counted() - deg_start) <= 50:
@@ -66,6 +63,7 @@ def green_intersection(direction):
             u_turn()
         else:
             print('turn left')
+            # 右折の処理
     else:
         deg_start = motorRight.get_degrees_counted()
         isLeftGreen = False
@@ -78,9 +76,11 @@ def green_intersection(direction):
             u_turn()
         else:
             print('turn right')
+            # 左折の処理
 
 def u_turn():
     print('U-turn')
+    # Uターンの処理
 
 def isGreen(direction):
     if direction == 'l':
@@ -90,25 +90,22 @@ def isGreen(direction):
         hsv_right = changeRGBtoHSV(colorRight.get_rgb_intensity())
         return (150 < hsv_right[0] < 180 and hsv_right[1] > 20 and hsv_right[2] > 10)
 
-while timer.now() < 10:
-    try:
-        rgb_left = colorLeft.get_rgb_intensity()
-        hsv_left = changeRGBtoHSV(rgb_left)
-        if 150 < hsv_left[0] < 180 and hsv_left[1] > 20 and hsv_left[2] > 10:
-            print('Left sensor is over green')
-            green_intersection('l')
-        rgb_right = colorRight.get_rgb_intensity()
-        hsv_right = changeRGBtoHSV(rgb_right)
-        if 150 < hsv_right[0] < 180 and hsv_right[1] > 20 and hsv_right[2] > 10:
-            print('Right sensor is over green')
-            green_intersection('r')
-        error = (rgb_left[1] - rgb_right[1]) / 4.7
-    except:
-        print('cannot get RGB')
+while True:
+    rgb_left = colorLeft.get_rgb_intensity()
+    hsv_left = changeRGBtoHSV(rgb_left)
+    if 150 < hsv_left[0] < 180 and hsv_left[1] > 20 and hsv_left[2] > 10:
+        print('Left sensor is over green')
+        green_intersection('l')
+
+    rgb_right = colorRight.get_rgb_intensity()
+    hsv_right = changeRGBtoHSV(rgb_right)
+    if 150 < hsv_right[0] < 180 and hsv_right[1] > 20 and hsv_right[2] > 10:
+        print('Right sensor is over green')
+        green_intersection('r')
+
+    error = (rgb_left[1] - rgb_right[1]) / 4.7
     u = Kp * error + Ki * (error + last_error) + Kd * (error - last_error)
     tank.start_tank(int(basic_speed + u),int(basic_speed - u))
     count += 1
-    wait_for_seconds(0.01)
 
 tank.stop()
-print(10/count*1000)
